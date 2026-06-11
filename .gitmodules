@@ -1,0 +1,3 @@
+[submodule "research/SwarmAI"]
+	path = research/SwarmAI
+	url = https://github.com/xg-gh-25/SwarmAI.git
