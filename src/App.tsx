@@ -1,136 +1,187 @@
-import Game from './components/Game.tsx';
-
+import { useMemo, useState } from 'react';
+import { Nexus3DWorld, agents } from './three/Nexus3DWorld';
 import { ToastContainer } from 'react-toastify';
-import a16zImg from '../assets/a16z.png';
-import convexImg from '../assets/convex.svg';
-import starImg from '../assets/star.svg';
-import helpImg from '../assets/help.svg';
-// import { UserButton } from '@clerk/clerk-react';
-// import { Authenticated, Unauthenticated } from 'convex/react';
-// import LoginButton from './components/buttons/LoginButton.tsx';
-import { useState } from 'react';
-import ReactModal from 'react-modal';
-import MusicButton from './components/buttons/MusicButton.tsx';
-import Button from './components/buttons/Button.tsx';
-import InteractButton from './components/buttons/InteractButton.tsx';
-import FreezeButton from './components/FreezeButton.tsx';
-import { MAX_HUMAN_PLAYERS } from '../convex/constants.ts';
 import PoweredByConvex from './components/PoweredByConvex.tsx';
 
+const worldSelector = [
+  { name: 'Origin Planet', status: 'active' },
+  { name: 'Central Hub', status: 'soon' },
+  { name: 'Creator Moon', status: 'soon' },
+  { name: 'Academy World', status: 'soon' },
+  { name: 'Combat Zone', status: 'soon' },
+  { name: 'Market District', status: 'soon' },
+  { name: 'Spaceport', status: 'locked' },
+];
+
+const initialFeed = [
+  '[World] Day 1 begins.',
+  '[Agent] Mason is looking for building materials.',
+  '[Agent] Ava is checking everyone is safe.',
+  '[Evolution] Campfire unlocked.',
+  '[Future Lock] Flying cars require anti-gravity.',
+];
+
 export default function Home() {
-  const [helpModalOpen, setHelpModalOpen] = useState(false);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
+  const [feedItems, setFeedItems] = useState<string[]>(initialFeed);
+  const [eventText, setEventText] = useState('');
+
+  const selectedAgent = useMemo(
+    () => agents.find((agent) => agent.id === selectedAgentId) ?? null,
+    [selectedAgentId],
+  );
+
+  const handleSubmitEvent = () => {
+    if (!eventText.trim()) return;
+    setFeedItems((items) => [...items, `[World Event] ${eventText.trim()}`]);
+    setEventText('');
+  };
+
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-between font-body game-background">
+    <main className="min-h-screen bg-slate-950 text-slate-100">
       <PoweredByConvex />
-
-      <ReactModal
-        isOpen={helpModalOpen}
-        onRequestClose={() => setHelpModalOpen(false)}
-        style={modalStyles}
-        contentLabel="Help modal"
-        ariaHideApp={false}
-      >
-        <div className="font-body">
-          <h1 className="text-center text-6xl font-bold font-display game-title">Help</h1>
-          <p>
-            Welcome to AI town. AI town supports both anonymous <i>spectators</i> and logged in{' '}
-            <i>interactivity</i>.
-          </p>
-          <h2 className="text-4xl mt-4">Spectating</h2>
-          <p>
-            Click and drag to move around the town, and scroll in and out to zoom. You can click on
-            an individual character to view its chat history.
-          </p>
-          <h2 className="text-4xl mt-4">Interactivity</h2>
-          <p>
-            If you log in, you can join the simulation and directly talk to different agents! After
-            logging in, click the "Interact" button, and your character will appear somewhere on the
-            map with a highlighted circle underneath you.
-          </p>
-          <p className="text-2xl mt-2">Controls:</p>
-          <p className="mt-4">Click to navigate around.</p>
-          <p className="mt-4">
-            To talk to an agent, click on them and then click "Start conversation," which will ask
-            them to start walking towards you. Once they're nearby, the conversation will start, and
-            you can speak to each other. You can leave at any time by closing the conversation pane
-            or moving away. They may propose a conversation to you - you'll see a button to accept
-            in the messages panel.
-          </p>
-          <p className="mt-4">
-            AI town only supports {MAX_HUMAN_PLAYERS} humans at a time. If you're idle for five
-            minutes, you'll be automatically removed from the simulation.
-          </p>
-        </div>
-      </ReactModal>
-      {/*<div className="p-3 absolute top-0 right-0 z-10 text-2xl">
-        <Authenticated>
-          <UserButton afterSignOutUrl="/ai-town" />
-        </Authenticated>
-
-        <Unauthenticated>
-          <LoginButton />
-        </Unauthenticated>
-      </div> */}
-
-      <div className="w-full lg:h-screen min-h-screen relative isolate overflow-hidden lg:p-8 shadow-2xl flex flex-col justify-start">
-        <h1 className="mx-auto text-4xl p-3 sm:text-8xl lg:text-9xl font-bold font-display leading-none tracking-wide game-title w-full text-left sm:text-center sm:w-auto">
-          AI Town
-        </h1>
-
-        <div className="max-w-xs md:max-w-xl lg:max-w-none mx-auto my-4 text-center text-base sm:text-xl md:text-2xl text-white leading-tight shadow-solid">
-          A virtual town where AI characters live, chat and socialize.
-          {/* <Unauthenticated>
-            <div className="my-1.5 sm:my-0" />
-            Log in to join the town
-            <br className="block sm:hidden" /> and the conversation!
-          </Unauthenticated> */}
-        </div>
-
-        <Game />
-
-        <footer className="justify-end bottom-0 left-0 w-full flex items-center mt-4 gap-3 p-6 flex-wrap pointer-events-none">
-          <div className="flex gap-4 flex-grow pointer-events-none">
-            <FreezeButton />
-            <MusicButton />
-            <Button href="https://github.com/a16z-infra/ai-town" imgUrl={starImg}>
-              Star
-            </Button>
-            <InteractButton />
-            <Button imgUrl={helpImg} onClick={() => setHelpModalOpen(true)}>
-              Help
-            </Button>
+      <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-8 rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.35em] text-cyan-300/70">NEXUS Worlds</p>
+              <h1 className="mt-2 text-4xl font-bold tracking-tight text-white sm:text-5xl">
+                Origin Planet — Origin Age
+              </h1>
+              <p className="mt-3 max-w-2xl text-sm text-slate-300 sm:text-base">
+                The first playable AI civilisation prototype. Walk the world with WASD, click agents to inspect them, and watch the colony evolve from camp life towards futuristic technology.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-3xl bg-slate-950/90 p-4 text-sm text-slate-200 ring-1 ring-white/10">
+                <p className="text-xs uppercase text-slate-400">World</p>
+                <p className="mt-1 font-semibold">Origin Planet</p>
+              </div>
+              <div className="rounded-3xl bg-slate-950/90 p-4 text-sm text-slate-200 ring-1 ring-white/10">
+                <p className="text-xs uppercase text-slate-400">Day</p>
+                <p className="mt-1 font-semibold">1</p>
+              </div>
+              <div className="rounded-3xl bg-slate-950/90 p-4 text-sm text-slate-200 ring-1 ring-white/10">
+                <p className="text-xs uppercase text-slate-400">Age</p>
+                <p className="mt-1 font-semibold">Origin Age</p>
+              </div>
+              <div className="rounded-3xl bg-slate-950/90 p-4 text-sm text-slate-200 ring-1 ring-white/10">
+                <p className="text-xs uppercase text-slate-400">Goal</p>
+                <p className="mt-1 font-semibold">Survive, build, evolve</p>
+              </div>
+            </div>
           </div>
-          <a href="https://a16z.com">
-            <img className="w-8 h-8 pointer-events-auto" src={a16zImg} alt="a16z" />
-          </a>
-          <a href="https://convex.dev/c/ai-town">
-            <img className="w-20 h-8 pointer-events-auto" src={convexImg} alt="Convex" />
-          </a>
-        </footer>
-        <ToastContainer position="bottom-right" autoClose={2000} closeOnClick theme="dark" />
+        </div>
+
+        <div className="grid gap-6 xl:grid-cols-[1.75fr_0.95fr]">
+          <div className="space-y-4">
+            <Nexus3DWorld selectedAgentId={selectedAgentId} onSelectAgent={setSelectedAgentId} />
+
+            <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl">
+                <h2 className="text-xl font-semibold text-white">Activity Feed</h2>
+                <div className="mt-4 space-y-3 text-sm text-slate-200">
+                  {feedItems.map((item, index) => (
+                    <div key={`${item}-${index}`} className="rounded-2xl bg-slate-950/80 p-3 ring-1 ring-white/5">
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl">
+                <h2 className="text-xl font-semibold text-white">World Selector</h2>
+                <div className="mt-4 space-y-3 text-sm text-slate-200">
+                  {worldSelector.map((world) => (
+                    <div
+                      key={world.name}
+                      className={`flex items-center justify-between rounded-2xl px-4 py-3 ring-1 ring-white/5 ${
+                        world.status === 'active'
+                          ? 'bg-cyan-500/10 text-cyan-200'
+                          : world.status === 'locked'
+                          ? 'bg-slate-950/60 text-slate-500'
+                          : 'bg-slate-950/70 text-slate-300'
+                      }`}
+                    >
+                      <span>{world.name}</span>
+                      <span className="rounded-full bg-white/5 px-3 py-1 text-[11px] uppercase text-slate-300">
+                        {world.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-slate-300">Trigger world event</label>
+                  <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                    <input
+                      value={eventText}
+                      onChange={(event) => setEventText(event.target.value)}
+                      placeholder="A storm is coming..."
+                      className="min-w-0 flex-1 rounded-2xl border border-white/10 bg-slate-950/90 px-4 py-3 text-slate-100 outline-none ring-1 ring-transparent transition focus:ring-cyan-400/40"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSubmitEvent}
+                      className="rounded-2xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside className="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Agent Inspector</p>
+                <h2 className="mt-2 text-2xl font-semibold text-white">Selected Citizen</h2>
+              </div>
+              <span className="rounded-full bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.2em] text-slate-300">
+                Click an agent
+              </span>
+            </div>
+
+            {selectedAgent ? (
+              <div className="mt-6 space-y-4 text-sm text-slate-200">
+                <div className="rounded-3xl bg-slate-950/80 p-4 ring-1 ring-white/5">
+                  <p className="text-xs uppercase text-slate-400">Name</p>
+                  <p className="mt-1 text-lg font-semibold text-white">{selectedAgent.name}</p>
+                </div>
+                <div className="grid gap-3">
+                  <div className="rounded-3xl bg-slate-950/80 p-4 ring-1 ring-white/5">
+                    <p className="text-xs uppercase text-slate-400">Role</p>
+                    <p className="mt-1 text-sm text-slate-100">{selectedAgent.role}</p>
+                  </div>
+                  <div className="rounded-3xl bg-slate-950/80 p-4 ring-1 ring-white/5">
+                    <p className="text-xs uppercase text-slate-400">Mood</p>
+                    <p className="mt-1 text-sm text-slate-100">{selectedAgent.mood}</p>
+                  </div>
+                </div>
+                <div className="rounded-3xl bg-slate-950/80 p-4 ring-1 ring-white/5">
+                  <p className="text-xs uppercase text-slate-400">Current Goal</p>
+                  <p className="mt-1 text-sm text-slate-100">{selectedAgent.goal}</p>
+                </div>
+                <div className="rounded-3xl bg-slate-950/80 p-4 ring-1 ring-white/5">
+                  <p className="text-xs uppercase text-slate-400">Memory</p>
+                  <p className="mt-1 text-sm text-slate-100">{selectedAgent.memory}</p>
+                </div>
+                <div className="rounded-3xl bg-slate-950/80 p-4 ring-1 ring-white/5">
+                  <p className="text-xs uppercase text-slate-400">Skill</p>
+                  <p className="mt-1 text-sm text-slate-100">{selectedAgent.skill}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-6 rounded-3xl bg-slate-950/80 p-6 text-sm text-slate-300 ring-1 ring-white/5">
+                Select one of the six AI citizens in the 3D world to inspect their current goal, recent memory, and skill focus.
+              </div>
+            )}
+          </aside>
+        </div>
       </div>
+      <ToastContainer position="bottom-right" autoClose={2000} closeOnClick theme="dark" />
     </main>
   );
 }
-
-const modalStyles = {
-  overlay: {
-    backgroundColor: 'rgb(0, 0, 0, 75%)',
-    zIndex: 12,
-  },
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    maxWidth: '50%',
-
-    border: '10px solid rgb(23, 20, 33)',
-    borderRadius: '0',
-    background: 'rgb(35, 38, 58)',
-    color: 'white',
-    fontFamily: '"Upheaval Pro", "sans-serif"',
-  },
-};
