@@ -1,0 +1,56 @@
+# Unreal Engine generated folders
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Build/
+
+# Visual Studio / IDE
+.vs/
+.vscode/
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+*.sln.DotSettings.user
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# Logs and crash dumps
+*.log
+*.log.*
+*.dmp
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build/debug symbols
+*.pdb
+*.ilk
+*.obj
+*.pch
+*.ipch
+
+# Node/web prototype dependencies
+node_modules/
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Local editor/config
+*.code-workspace
