@@ -1,0 +1,53 @@
+name: Unreal Engine Build Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  validate-repo:
+    name: Validate repository structure
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          lfs: true
+
+      - name: Check required docs exist
+        shell: pwsh
+        run: |
+          $required = @(
+            "docs/MASTER_UNREAL_GAME_MODEL.md",
+            "docs/UNREAL_VERTICAL_SLICE_BUILD_PLAN.md",
+            "docs/BUILD_INSTRUCTIONS.md",
+            "docs/CODING_GUIDELINES.md"
+          )
+
+          foreach ($file in $required) {
+            if (!(Test-Path $file)) {
+              Write-Error "Missing required file: $file"
+            }
+          }
+
+      - name: Check Unreal project file if present
+        shell: pwsh
+        run: |
+          $uproject = Get-ChildItem -Path . -Filter "*.uproject" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($null -eq $uproject) {
+            Write-Host "No Unreal .uproject file found yet. This is expected until the Unreal project is created."
+          } else {
+            Write-Host "Found Unreal project: $($uproject.FullName)"
+          }
+
+      - name: Reminder for full Unreal CI
+        shell: pwsh
+        run: |
+          Write-Host "This workflow validates repo structure only."
+          Write-Host "Full Unreal build automation requires a runner with Unreal Engine installed."
+          Write-Host "When UE5 is installed on a self-hosted runner, add BuildCookRun or UnrealBuildTool steps."
