@@ -527,3 +527,75 @@ The end game is an original Unreal Engine open-world AI civilisation game where 
 The goal is not to copy GTA or Star Citizen.
 
 The goal is to create a living world that feels more personal, reactive and memorable than a standard open-world game.
+
+## Unreal First Storm Implementation Contract
+
+This implementation contract narrows the master vision into the first Unreal vertical slice. It does not expand the slice to multiplayer, vehicles, space travel, large cities or production AI services.
+
+### Recommended Content Structure
+
+```text
+Content/
+  Blueprints/
+    Characters/
+      BP_FounderCharacter
+      BP_Citizen_Base
+      BP_Citizen_Mason
+    GameLogic/
+      BP_MissionManager
+      BP_ActivityFeedManager
+      BP_StormManager
+      BP_ShelterManager
+  UI/
+    WBP_LoadingScreen
+    WBP_FounderProfile
+    WBP_CareerSelect
+    WBP_GameHUD
+    WBP_MissionTracker
+    WBP_ActivityFeed
+    WBP_InteractionPrompt
+    WBP_DailySummary
+    WBP_TechTree
+  DataAssets/
+    DA_Careers
+    DA_CitizenPresets
+    DA_Missions
+  Maps/
+    OriginPlanet
+  Materials/
+  Sounds/
+```
+
+### Blueprint Responsibilities
+
+- `BP_FounderCharacter`: first-person camera, movement, camp bounds, proximity detection and explicit interaction input.
+- `BP_Citizen_Base`: common role, mood, energy, trust, current goal, current action and recent memory state.
+- `BP_MissionManager`: deterministic mission state and objective progression.
+- `BP_ActivityFeedManager`: ordered local event history and HUD notifications.
+- `BP_StormManager`: storm state, lighting changes, lightning effects and citizen reaction dispatch.
+- `BP_ShelterManager`: construction progress and visible shelter stages.
+- UMG widgets: event-driven presentation of Founder setup, HUD, prompts, daily summary and tech state.
+
+### Build Order
+
+1. Create the Founder first-person controller and bounded movement.
+2. Block out the Origin Planet camp and static landmarks.
+3. Add the six citizen actors and shared citizen state.
+4. Implement the deterministic mission manager.
+5. Add the HUD, mission tracker, activity feed and interaction prompt.
+6. Add proximity checks and Mason interaction.
+7. Add storm triggering, visual effects and scripted citizen reactions.
+8. Add visible shelter construction stages.
+9. Add manual day advancement and the daily summary.
+10. Add Founder profile and career setup.
+11. Add the cinematic loading transition.
+12. Package, test and polish the complete First Storm mission flow.
+
+### Technical Rules
+
+- Keep all first-slice state deterministic and local.
+- Do not add external AI model calls to the vertical slice.
+- Use Behavior Trees and EQS only where they improve observable citizen behaviour.
+- Prefer event-driven UMG updates over expensive per-frame widget bindings.
+- Treat the React First Storm demo as a gameplay and visual reference, not production Unreal code.
+- Confirm the exact supported Unreal Engine version before creating or upgrading the `.uproject`; do not assume a future engine version is installed.

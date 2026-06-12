@@ -56,3 +56,16 @@ The first MVP should show:
 ## Build Rule
 
 Do not try to build the full MMO/VR version first. Build the smallest working AI world first, then scale it.
+
+## First Storm Browser Demo
+
+The repository now includes a local React, TypeScript, and React Three Fiber prototype of the first playable NEXUS Worlds loop. It provides Founder onboarding, career selection, first-person camp exploration, six citizens, Mason interaction, the storm event, shelter progress, mission tracking, an activity feed, and manual day advancement using mock local state.
+
+Run it from Git Bash or another terminal:
+
+```bash
+npm install
+npm run dev
+```
+
+Then open the local URL printed by Vite. Click the 3D viewport to capture the mouse, use `WASD` to move, and press `E` near Mason to interact.
